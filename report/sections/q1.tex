@@ -1,0 +1,41 @@
+\section{Questão 1: pesos iniciais e funções de ativação}
+
+\subsection*{a. Descrição da configuração experimental}
+
+A rede tem 16 entradas, duas camadas ocultas com 50 neurônios cada e 7 saídas. Esse tamanho está dentro da faixa
+explorada na Questão 3 e serve de ponto de partida. As camadas ocultas usam ReLU, que não satura para ativações positivas
+e costuma convergir bem com a inicialização usada pela classe. A saída usa softmax, que produz uma distribuição de
+probabilidade sobre as classes. A perda é a entropia cruzada categórica, a escolha padrão para esse tipo de saída.
+
+O otimizador é SGD com momento = 0,9 e LR = 0,01, por até 300 épocas. Usar SGD desde o início mantém esta etapa comparável
+com a Questão 2. Foram feitos cinco treinamentos com seeds diferentes e, para justificar a ReLU, os mesmos cinco com tanh e
+logistic. Só o conjunto de treino é usado.
+
+\subsection*{b. Resultados}
+
+\tabela{q1_seeds}{Cinco treinamentos com ReLU, no conjunto de treino.}
+\tabela{q1_ativacoes}{Comparação das funções de ativação (média de cinco seeds).}
+\figura{q1_curvas_seeds}{Perda e acurácia de treino com ReLU, por seed, a partir da quinta época.}{0.8}
+\figura{q1_curvas_ativacoes}{Perda (em escala logarítmica) e acurácia de treino por função de ativação.}{0.8}
+
+\subsection*{c. Análise e discussão}
+
+Os cinco treinamentos com ReLU são quase coincidentes: a perda final varia de 0,1460 a 0,1502, e a acurácia de 0,9441 a
+0,9463. A inicialização afeta só as primeiras épocas, e o desvio final é pequeno (0,0015 na perda, 0,0009 na acurácia).
+As curvas seguem caindo devagar na época 300, com oscilações pequenas, sem sinal de instabilidade.
+
+Quanto à ativação, ReLU e tanh chegam a resultados próximos (perda 0,1480 e 0,1520). A logistic demora muito mais: são
+239 épocas até a perda de 0,20, contra 12 da ReLU, e fica com a pior perda final (0,1947). Nas primeiras épocas, sua
+acurácia fica parada em cerca de 0,26, a proporção da classe majoritária.
+
+Sobre over e underfitting, os dados de treino sozinhos só permitem uma conclusão parcial. Não há underfitting evidente,
+pois a acurácia passa de 0,94 em todas as seeds. O overfitting não pode ser avaliado sem um conjunto separado, o que é
+feito a partir da próxima questão.
+
+\subsection*{d. Conclusão da etapa}
+
+O modelo aprende os padrões básicos, com acurácia de treino de 0,945. O treinamento é estável em relação aos pesos iniciais,
+e a ReLU é adequada: converge tão bem quanto a tanh, é muito mais rápida que a logistic e não apresentou nenhuma
+instabilidade nessa configuração. A topologia 50$\times$50 com ReLU segue como base da Questão 2.
+
+\FloatBarrier

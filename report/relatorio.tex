@@ -1,0 +1,88 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{placeins}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{../results/figures/}{assets/}}
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% \tabela{arquivo em tables/}{legenda}
+\newcommand{\tabela}[2]{%
+  \begin{table}[H]
+    \centering
+    \caption{#2}
+    \label{tab:#1}
+    \begin{adjustbox}{max width=\textwidth}
+      \input{tables/#1}
+    \end{adjustbox}
+  \end{table}%
+}
+
+% \figura{arquivo em results/figures/}{legenda}{largura relativa ao texto}
+\newcommand{\figura}[3]{%
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=#3\textwidth]{#1}
+    \caption{#2}
+    \label{fig:#1}
+  \end{figure}%
+}
+
+\title{\includegraphics[width=2.6cm]{brasao_uece}\\[1em]
+  Experimento dirigido: MLP com backpropagation na base Dry Bean\\
+  \large Avaliação de Inteligência Computacional, 2026.2}
+\author{[Samuel William Silva Almeida\\
+  \small Matrícula: 1631353]}
+\date{Novembro de 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  Este relatório investiga uma rede MLP treinada por backpropagation na classificação de sete variedades de
+  feijão a partir de 16 atributos geométricos. Foram avaliados inicialização, taxa de aprendizado, momento,
+  topologia, quantidade e qualidade dos dados, atributos e, por fim, a generalização por validação cruzada.
+  A configuração final, com camadas ocultas 80$\times$80, LR = 0,01, momento = 0,7 e 10 atributos de forma, obteve
+  Medida-F macro de $0{,}9436 \pm 0{,}0085$ em validação cruzada com 10 partições. A variação entre partições
+  superou a variação entre as 30 topologias testadas, e a regressão logística ficou a 0,0070 da MLP.
+\end{abstract}
+
+\clearpage
+\tableofcontents
+\clearpage
+
+\input{sections/metodologia}
+\input{sections/q1}
+\input{sections/q2}
+\input{sections/q3}
+\input{sections/q4}
+\input{sections/q5}
+\input{sections/q6}
+\input{sections/q7}
+\input{sections/conclusao}
+
+\begin{thebibliography}{9}
+  \bibitem{koklu2020} M. Koklu e I. A. Ozkan. Multiclass classification of dry beans using computer vision and
+    machine learning techniques. \emph{Computers and Electronics in Agriculture}, 174:105507, 2020.
+  \bibitem{uci} Dry Bean Dataset. UCI Machine Learning Repository, 2020.
+    \url{https://doi.org/10.24432/C50S4B}.
+  \bibitem{sklearn} F. Pedregosa et al. Scikit-learn: Machine learning in Python.
+    \emph{Journal of Machine Learning Research}, 12:2825--2830, 2011.
+  \bibitem{geron} A. Géron. \emph{Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow}.
+    3.\ ed. O'Reilly, 2022.
+\end{thebibliography}
+
+\end{document}

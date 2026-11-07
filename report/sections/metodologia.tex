@@ -1,0 +1,60 @@
+\section{Introdução e metodologia comum}
+
+A tarefa é classificar grãos de feijão seco em sete variedades (Barbunya, Bombay, Cali, Dermason, Horoz, Seker e
+Sira) a partir de 16 atributos numéricos extraídos de imagens \cite{koklu2020,uci}. Todo o experimento está em
+\texttt{notebooks/mlp\_dry\_bean.ipynb}, e as tabelas e figuras deste texto são geradas por ele.
+
+O enunciado traz três sobras de versões anteriores: cita o Fashion-MNIST na Questão 1, chama de ``Questão 5'' e
+``Questão 6'' os relatos das seções 6 e 7, e chama de ``Questão 4'' a validação inicial. Este relatório segue os títulos
+das seções e trata a base como Dry Bean em todas as etapas.
+
+\subsection{Dados}
+
+A base original tem 13.611 exemplos, sem valores ausentes. Havia 68 linhas duplicadas, removidas antes da divisão para
+que a mesma linha não caísse no treino e no teste ao mesmo tempo (Tabela~\ref{tab:dados_visao_geral}). As classes são
+desbalanceadas: Dermason tem 3.546 exemplos e Bombay, 522 (Figura~\ref{fig:dados_classes}). Os atributos são muito
+correlacionados, com $|r|$ de 0,999 entre \texttt{Compactness} e \texttt{ShapeFactor3}, e de aproximadamente 1,00 entre
+\texttt{Area} e \texttt{ConvexArea} (Figura~\ref{fig:dados_correlacao}).
+
+\tabela{dados_visao_geral}{Exemplos em cada etapa da preparação. A divisão é estratificada e fixa (70/15/15).}
+\figura{dados_classes}{Exemplos por classe, após a remoção de duplicatas.}{0.65}
+\figura{dados_correlacao}{Correlação de Pearson entre os 16 atributos.}{0.8}
+
+\subsection{Modelo e pré-processamento}
+
+O modelo é o \texttt{MLPClassifier} do scikit-learn \cite{sklearn}, com SGD, momento clássico (sem Nesterov), lotes de 200
+exemplos e regularização L2 com $\alpha = 10^{-4}$, salvo onde indicado. As camadas ocultas usam ReLU; a de saída usa
+softmax e a perda é a entropia cruzada categórica. A classe aplica softmax e entropia cruzada automaticamente em
+problemas multiclasse e converte os rótulos internamente em one-hot, cumprindo a codificação recomendada no enunciado.
+O z-score é ajustado apenas no conjunto de treino de cada execução e aplicado depois aos demais, o que evita vazamento.
+
+\subsection{Laço de treinamento}
+
+Para registrar métricas a cada época, o treino usa \texttt{partial\_fit}. A alternativa sugerida na documentação,
+\texttt{warm\_start=True} com \texttt{max\_iter=1}, recria o otimizador a cada chamada e zera a velocidade do momento no início
+de cada época. Além disso, uma seed inteira repete o embaralhamento em todas as épocas, por isso a seed é passada como
+um objeto \texttt{RandomState}.
+
+A Tabela~\ref{tab:q2_laco_treino} e a Figura~\ref{fig:q2_laco_treino} medem esses efeitos. Depois de 200 épocas, a perda
+com \texttt{warm\_start} e seed inteira fica 3\% acima da obtida com \texttt{partial\_fit} em LR = 0,01 e 25\% acima em
+LR = 0,1. O efeito é moderado porque cada época tem 48 lotes e, com momento 0,9, a velocidade se recompõe em cerca de 10.
+
+\tabela{q2_laco_treino}{Perda de treino na época 200 para três laços de treinamento (três seeds).}
+\figura{q2_laco_treino}{Curvas de perda dos três laços, a partir da quinta época.}{0.85}
+
+\subsection{Critérios e métricas}
+
+\begin{itemize}
+  \item \textbf{Parada:} perda de treino $\le 0{,}001$ ou limite de épocas. Como esse valor raramente é atingido, a velocidade
+    também é medida pelas épocas até a perda de treino chegar a 0,20.
+  \item \textbf{Perda:} entropia cruzada calculada no conjunto inteiro ao fim de cada época, sem o termo L2.
+  \item \textbf{Medida-F, precisão e revocação:} médias macro, em que cada classe pesa igual, inclusive a minoritária.
+  \item \textbf{Repetições:} três ou cinco seeds por configuração. Os resultados são média e desvio-padrão (dp).
+  \item \textbf{Tempo:} os treinos rodam em paralelo, e os tempos medidos nessa condição não são comparáveis. Uma medição
+    à parte roda um treino por vez, em uma thread, por 30 épocas, e registra o mínimo de cinco repetições intercaladas. Os
+    valores são de uma única máquina e servem para comparar configurações entre si.
+  \item \textbf{Uso do teste:} até a Questão 5 toda escolha usa a validação. As Questões 4 e 5 reportam o teste porque o
+    enunciado pede, sem decidir nada com ele.
+\end{itemize}
+
+\FloatBarrier

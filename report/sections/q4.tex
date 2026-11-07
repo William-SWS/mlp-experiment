@@ -1,0 +1,48 @@
+\section{Questão 4: quantidade e qualidade dos dados de treino}
+
+\subsection*{a. Descrição do experimento}
+
+Rede 80$\times$80 com LR = 0,01, momento = 0,7, ReLU, softmax e entropia cruzada, por até 500 épocas e com cinco seeds. Validação e teste permanecem fixos em todas as
+condições, de modo que os números são comparáveis. A seed define tanto a amostra quanto os pesos iniciais.
+
+\begin{itemize}
+  \item \textbf{Quantidade:} 5, 10, 20, 40, 60, 80 e 100\% do conjunto de treino, com amostragem estratificada. As frações de 5 e 10\% foram acrescentadas às sugeridas para localizar melhor a região de queda.
+  \item \textbf{Qualidade dos rótulos:} 5, 10 e 20\% dos rótulos de treino trocados por outra classe sorteada. Validação e teste mantêm os rótulos corretos.
+  \item \textbf{Representatividade:} amostragem estratificada contra aleatória, com 5 e 20\% dos dados.
+\end{itemize}
+
+\subsection*{b. Resultados}
+
+\tabela{q4_quantidade}{Efeito da quantidade de exemplos de treino (média de cinco seeds).}
+\figura{q4_generalizacao}{Curvas de generalização: perda, acurácia e Medida-F contra o número de exemplos de treino. As barras indicam $\pm$ 1 dp.}{1}
+\figura{q4_tempo}{Tempo por época contra o número de exemplos de treino.}{0.5}
+\figura{q4_curvas_fracoes}{Curvas de perda para cada fração de dados, a partir da época 50.}{0.8}
+\tabela{q4_ruido}{Efeito de rótulos errados no treino, com 100\% dos dados.}
+\figura{q4_curvas_ruido}{Curvas de perda com rótulos de treino corrompidos, a partir da época 10.}{0.8}
+\tabela{q4_amostragem}{Amostragem estratificada contra aleatória.}
+
+\subsection*{c. Análise e discussão}
+
+\textbf{Quantidade.} A generalização melhora de forma contínua, com retorno decrescente. De 5 a 40\%, a Medida-F de teste vai de 0,9176 a 0,9305. De 40 a 100\%, ganha só mais 0,0053 e
+chega a 0,9358. A perda de treino pouco muda (0,14 a 0,15), enquanto a de validação cai de 0,2666 para 0,1894: a diferença entre as duas passa de 0,122 para 0,035. A perda de
+validação não satura dentro da faixa testada, embora a Medida-F quase sature. Isso indica que mais dados ainda melhoram a qualidade das probabilidades previstas, mesmo com poucos erros de classe a menos.
+
+Há uma ressalva de desenho: como o limite é de 500 épocas, frações menores recebem menos atualizações dos pesos (1.500 com 5\% e 24.000 com 100\%). Nas curvas, a perda de treino de todas
+as frações converge para o mesmo nível antes da época 500, o que sugere que a falta de atualizações não domina o resultado. O efeito, porém, não foi separado.
+
+\textbf{Qualidade dos rótulos.} O ruído afeta mais a perda do que a classificação. Com 20\% de rótulos errados, a perda de validação dobra (de 0,1894 para 0,3891), enquanto a Medida-F de
+teste cai de 0,9358 para 0,9314. Como o ruído é uniforme, a classe correta continua sendo a mais frequente em cada região do espaço de atributos, e a decisão muda pouco. O que piora
+é a confiança das probabilidades. Um ruído concentrado em classes parecidas, como Sira e Dermason, provavelmente causaria mais dano, mas isso não foi testado.
+
+\textbf{Representatividade.} A estratificação quase não muda a média, mas reduz a variabilidade em amostras muito pequenas: com 5\% dos dados, o desvio da Medida-F de teste é de 0,0028 na
+estratificada e de 0,0082 na aleatória. Com 20\%, os desvios são quase iguais (0,0030 e 0,0029) e os dois métodos se equivalem.
+
+\textbf{Tempo.} O tempo por época é linear no número de exemplos: 2,6~ms com 473 e 35,5~ms com 9.479. Em 500 épocas, são cerca de 1,3~s e 17,8~s.
+
+\subsection*{d. Conclusão da etapa}
+
+A rede já generaliza bem com poucos dados, e o ganho a partir de cerca de 40\% do treino (3.791 exemplos) é pequeno em Medida-F. O custo cresce de forma linear e é baixo nesta base, portanto o melhor
+equilíbrio é usar todos os dados disponíveis, que dão a menor perda e o menor desvio no teste. Com um limite real de coleta, 40 a 60\% já entregariam uma Medida-F de teste a cerca de 0,005 ou menos da obtida com todos os dados.
+A rede mostrou boa tolerância a ruído uniforme nos rótulos, com perda de qualidade concentrada nas probabilidades.
+
+\FloatBarrier

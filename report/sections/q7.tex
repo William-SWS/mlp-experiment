@@ -1,0 +1,43 @@
+\section{Questão 7: validação cruzada k-fold}
+
+\subsection*{a. Descrição do experimento}
+
+\textbf{Valor de k.} Foi usado k = 10. Cada teste tem cerca de 1.354 exemplos, dos quais cerca de 52 são da menor classe (Bombay), o que ainda dá uma estimativa razoável por classe. Cada treino usa 90\% dos dados, perto do que o modelo final usaria. O custo é baixo para esta base.
+
+\textbf{Configuração.} Rede 80$\times$80, ReLU, softmax, entropia cruzada, SGD com LR = 0,01 e momento = 0,7, $\alpha = 10^{-4}$, 481 épocas, 10 atributos de forma.
+
+\textbf{Procedimento.} A divisão usa \texttt{StratifiedKFold} sobre a base completa sem duplicatas (13.543 exemplos), o que mantém a proporção das classes em cada partição. Em cada rodada, o z-score é ajustado só nas nove partições de treino. A seed dos pesos é a mesma em todas as rodadas, de modo que a variação observada vem das partições.
+A regressão logística, nas mesmas partições, serve de referência linear.
+
+\subsection*{b. Resultados}
+
+\tabela{q7_particoes}{Métricas de teste por partição e perda de treino final.}
+\tabela{q7_estatisticas}{Média, variância e extremos das métricas entre as dez partições.}
+\figura{q7_particoes}{Medida-F de teste por partição. A linha tracejada marca a média.}{0.65}
+\figura{q7_curvas_perda}{Perda de treino e de teste na pior (1), na mediana (2) e na melhor (6) partição, a partir da época 20.}{1}
+\figura{q7_curvas_acuracia}{Acurácia de treino e de teste nas mesmas partições, a partir da época 20.}{1}
+\tabela{q7_por_classe}{Métricas por classe, com as previsões das dez partições reunidas.}
+\figura{q7_confusao}{Matriz de confusão com as previsões das dez partições reunidas.}{0.55}
+\tabela{q7_baseline}{MLP e regressão logística nas mesmas partições.}
+
+\subsection*{c. Análise e discussão}
+
+\textbf{Resultado médio e variabilidade.} A Medida-F é de $0{,}9436 \pm 0{,}0085$ (variância de 0,00007), a acurácia é de $0{,}9329 \pm 0{,}0101$ e a perda, de $0{,}1845 \pm 0{,}0260$. Os valores de Medida-F vão de 0,9291 a 0,9572.
+
+\textbf{Robustez.} A rede se comporta de modo consistente: nenhuma partição fica longe das demais, e o desvio é menor que 1\% da média. Por outro lado, esse desvio é maior que toda a faixa de Medida-F entre as 30 topologias da Questão 3 (0,0062). Assim, a escolha de quais exemplos caem no teste pesa mais no resultado do que a escolha da topologia dentro da faixa estudada.
+O resultado no teste da Questão 6 (0,9359) está dentro da faixa e perto do limite inferior de um desvio (0,9351), o que confirma que aquela divisão era um pouco mais difícil que a média.
+
+\textbf{Flutuações.} A perda de treino quase não muda entre partições (0,1561 a 0,1630), enquanto a de teste vai de 0,1447 a 0,2417. Na partição 6, a perda de teste é até menor que a de treino. A variação vem, portanto, de quais exemplos caem no teste, e o treinamento em si é estável. Quanto à causa, o provável é o número de exemplos das fronteiras entre classes parecidas presentes em cada partição, mais do que
+o desbalanceamento em si: a estratificação fixa as proporções, e a classe menor, Bombay, é quase sempre acertada (Medida-F de 0,9990). Essa explicação não foi testada partição a partição.
+
+\textbf{Erros por classe.} A matriz reunida confirma a Questão 6. Sira tem a menor Medida-F (0,8826), e Sira e Dermason respondem pelas maiores confusões: 247 e 177 exemplos nos dois sentidos, seguidas por Barbunya e Cali (57 e 47).
+
+\textbf{Comparação com o modelo linear.} A regressão logística chega a uma Medida-F de 0,9365 e perda de 0,2190. O ganho pareado da MLP é de $0{,}0070 \pm 0{,}0050$ na Medida-F, com vantagem em 8 das 10 partições. A MLP é melhor, com margem pequena, o que sugere que as fronteiras entre as classes são em boa parte quase lineares nesses atributos.
+
+\subsection*{d. Conclusão da etapa}
+
+A rede final generaliza de forma consistente, com Medida-F em torno de 0,94 e pouca variação entre partições. A estimativa é levemente otimista: como o enunciado prevê, a configuração foi escolhida com dados que também entram no k-fold, inclusive o teste da Questão 6.
+
+Duas melhorias parecem mais promissoras do que aumentar a rede: atributos ou amostras adicionais voltados à separação entre Sira e Dermason, e parada antecipada em conjunto com calibração das probabilidades, já que a perda se mostrou mais sensível que a Medida-F. São hipóteses que este estudo não testou.
+
+\FloatBarrier

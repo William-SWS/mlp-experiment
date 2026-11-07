@@ -1,0 +1,55 @@
+\section{Questão 2: taxa de aprendizado e termo momento}
+
+\subsection*{a. Descrição do experimento}
+
+Foi feita uma grade de 12 combinações: LR em \{0,001; 0,01; 0,1; 0,5\} e momento em \{0,5; 0,7; 0,9\}, com três seeds cada.
+A rede é a da Questão 1 (50$\times$50, ReLU, softmax, entropia cruzada), treinada por SGD com momento clássico. O critério de
+parada é perda de treino $\le 0{,}001$, com limite de 500 épocas.
+
+O treino atualiza os pesos, e a validação apenas acompanha a generalização. A regra de escolha foi fixada antes de rodar a grade:
+entre as combinações sem divergência e com perda final de validação até 5\% acima da melhor, fica a mais rápida até a perda de
+treino de 0,20. A tolerância existe porque diferenças tão pequenas ficam perto da variação entre seeds.
+
+\subsection*{b. Resultados}
+
+\tabela{q2_grade}{Grade de LR e momento (média de três seeds, em 500 épocas). ``Atingiu'' e ``Divergiu'' contam execuções.}
+\figura{q2_heatmap_perdas}{Perda final de treino e de validação. A cor usa escala logarítmica.}{0.75}
+\figura{q2_heatmap_velocidade}{Épocas até a perda de 0,20 e desvio da perda entre seeds. A célula vazia é a combinação que
+nunca chegou a 0,20.}{0.75}
+\figura{q2_curvas}{Curvas de perda em escala logarítmica. A linha tracejada marca o critério de 0,001.}{1}
+
+A combinação escolhida foi \textbf{LR = 0,01 e momento = 0,7}: perda de treino 0,1584, perda de validação 0,1908 e 28 épocas
+até a perda de 0,20. As candidatas dentro da tolerância foram LR = 0,001 com momento 0,9 (91 épocas), LR = 0,01 com momento 0,5
+(45 épocas) e a própria escolhida.
+
+\subsection*{c. Análise e discussão}
+
+\textbf{Critério de 0,001.} Nenhuma combinação atingiu esse valor em 500 épocas. Por isso, a coluna ``Épocas até 0,001''
+fica vazia, e a velocidade foi comparada pelo limiar de 0,20.
+
+\textbf{Taxa de aprendizado muito baixa.} Com LR = 0,001 e momento 0,5, são 447 épocas até a perda de 0,20, e a perda de
+validação ainda está caindo no fim do treino.
+
+\textbf{Taxa de aprendizado alta.} Com LR $\ge$ 0,1, a perda de treino cai mais e fica ruidosa, mas a de validação sobe:
+LR = 0,1 com momento 0,9 termina em 0,0735 no treino e 0,5709 na validação. As menores perdas de validação ao longo do treino são
+parecidas em quase toda a grade (de 0,188 a 0,196, à exceção do colapso descrito abaixo e de LR = 0,001 com momentos 0,5 e 0,7), mas são atingidas cedo
+quando a LR é alta. Nesse caso o problema é overfitting rápido, e a capacidade de aprender é a mesma.
+
+\textbf{Colapso.} Com LR = 0,5 e momento 0,9, a perda fica em 1,84 nas três seeds e a Medida-F é 0,0593. A entropia das classes
+é 1,8338, e prever sempre a classe majoritária dá Medida-F de 0,0593, ou seja, a rede aprendeu apenas a proporção das
+classes. Como os pesos continuam finitos, nenhuma execução foi contada como divergência numérica. A causa provável é a morte de
+neurônios ReLU após os primeiros passos grandes, que o experimento não verificou diretamente.
+
+\textbf{Efeito do momento.} O número de épocas até a perda de 0,20 acompanha a taxa efetiva $\eta/(1-m)$. O produto das épocas por essa
+taxa fica entre 0,89 e 0,93 nas cinco combinações com taxa efetiva de até 0,033. Assim, LR = 0,001 com momento 0,9 (taxa efetiva 0,01)
+leva 91 épocas, e LR = 0,01 com momento 0,5 (taxa efetiva 0,02) leva 45. Nessa faixa, o momento acelera o treino quase como aumentar a
+LR. A estabilidade, por outro lado, piora com os dois: o maior desvio da perda entre seeds ocorre em
+LR = 0,1 com momento 0,9 (0,0265).
+
+\subsection*{d. Conclusão da etapa}
+
+LR = 0,01 com momento = 0,7 teve a menor perda final de validação da grade e, entre as candidatas, a convergência mais rápida,
+sem oscilação visível. Essa combinação fica fixa na Questão 3. Momento e taxa de aprendizado aceleram o treino de forma parecida;
+acima de uma taxa efetiva de aproximadamente 0,1, o ganho de velocidade vem acompanhado de overfitting rápido e, no extremo, de colapso.
+
+\FloatBarrier

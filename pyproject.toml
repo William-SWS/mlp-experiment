@@ -1,0 +1,49 @@
+[project]
+name = "drybean-mlp"
+version = "0.1.0"
+description = "Estudo dirigido de MLP com backpropagation na base Dry Bean (Avaliação RNA 2026.2)"
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "jinja2>=3.1",
+    "joblib>=1.5",
+    "matplotlib>=3.10",
+    "numpy>=2.3",
+    "openpyxl>=3.1",
+    "pandas>=2.3",
+    "scikit-learn==1.9.1",
+    "seaborn>=0.13.2",
+    "threadpoolctl>=3.5",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29",
+    "jupyterlab>=4.4",
+    "nbconvert>=7.16",
+    "pytest>=8.4",
+    "ruff>=0.12",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/drybean_mlp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+src = ["src"]
+extend-exclude = ["results/.cache"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "NPY"]
+ignore = ["E741"]
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["E402", "E501"]

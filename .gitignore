@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.venv/
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+
+# Dados baixados do UCI e cache de treinos
+data/
+results/.cache/
+
+# Artefatos do LaTeX (o PDF final é mantido)
+report/*.aux
+report/*.bbl
+report/*.bcf
+report/*.blg
+report/*.fdb_latexmk
+report/*.fls
+report/*.log
+report/*.out
+report/*.run.xml
+report/*.toc

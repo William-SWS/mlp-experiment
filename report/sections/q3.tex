@@ -1,0 +1,66 @@
+\section{Questão 3: número de camadas e de neurônios}
+
+\subsection*{a. Descrição da configuração experimental}
+
+Foram testadas 30 topologias: 1, 2 e 3 camadas ocultas iguais, de 10 a 100 neurônios por camada, em passos de 10, com três seeds cada.
+Ficam fixos ReLU, softmax, entropia cruzada, SGD com LR = 0,01 e momento = 0,7, e $\alpha = 10^{-4}$. A parada é perda de treino
+$\le 0{,}001$ ou 500 épocas. O teste não é usado. O tempo total da tabela é o tempo por época multiplicado pelas épocas executadas.
+
+\subsection*{b. Resultados}
+
+\tabela{q3_topologias}{As 30 topologias (média de três seeds, em 500 épocas). ``Diferença'' é a perda de validação menos a de treino.}
+\figura{q3_heatmaps}{Medida-F, perdas e tempo por época para cada topologia.}{0.72}
+\figura{q3_curvas}{Perda de treino e de validação das quatro melhores redes e de dois extremos (10 e 100$\times$100$\times$100), a partir da
+época 20.}{0.85}
+
+Com LR = 0,01, nenhuma topologia atinge a perda de 0,001. Para examinar esse critério, um caso de contraste à parte da grade usa
+a maior rede com LR = 0,1 e momento = 0,9 (Tabela~\ref{tab:q3_contraste} e Figura~\ref{fig:q3_contraste}).
+
+\tabela{q3_contraste}{Contraste: 100$\times$100$\times$100 com LR = 0,1 e momento = 0,9. Fora da grade e da seleção.}
+\figura{q3_contraste}{Perda de treino e de validação no caso de contraste.}{0.6}
+
+\subsection*{c. Análise e discussão}
+
+\textbf{A topologia muda pouco o desempenho.} A Medida-F de validação vai de 0,9322 (10 neurônios) a 0,9384 (40$\times$40$\times$40), uma faixa de 0,0062,
+da mesma ordem dos desvios entre seeds (até 0,0038). Uma rede com uma camada de 70 neurônios (0,9371) fica muito perto de
+80$\times$80 (0,9380) e leva 21,1~ms por época, contra 34,2~ms.
+
+\textbf{A complexidade reduz a perda de treino, mas não a de validação.} De 10 neurônios a 100$\times$100$\times$100, a perda de treino cai de 0,1835
+para 0,1359. A de validação melhora só até redes médias e fica em torno de 0,19. A diferença entre as duas é de 0,02 com uma camada,
+0,03 com duas e chega a 0,06 com três.
+
+\textbf{Underfitting.} A rede de 10 neurônios tem as maiores perdas (0,1835 e 0,2088), o que é um underfitting leve, já que ela ainda alcança Medida-F
+de 0,9322. Nenhuma das redes testadas falha em aprender.
+
+\textbf{Overfitting.} Na grade, os sinais são moderados. Com 1 e 2 camadas, a validação ainda melhora por volta da época 450 a 500. As redes com
+3 camadas e pelo menos 30 neurônios atingem o mínimo entre as épocas 269 e 345 e depois sobem levemente. No contraste, o
+overfitting é claro: as três seeds atingem o critério de 0,001 entre as épocas 363 e 394, com acurácia de treino de pelo menos 0,9999, enquanto a
+perda de validação sobe de cerca de 0,19 (nas épocas 24 a 32) para mais de 0,79. A Medida-F de validação cai bem menos, para cerca de 0,926: a rede
+continua classificando razoavelmente, com probabilidades excessivamente confiantes. O critério de 0,001 mede, portanto, a capacidade de memorizar o treino,
+e atingi-lo não indica boa generalização nesta base.
+
+\textbf{Tempo.} O tempo por época cresce com o número de pesos: 15,8~ms com 10 neurônios, 41,0~ms com 100$\times$100 e 57,8~ms com
+100$\times$100$\times$100. Em 500 épocas, o total vai de 7,9~s a 28,9~s. O ponto de equilíbrio entre generalização e custo está nas redes de uma camada com
+60 a 90 neurônios ou nas de duas camadas com 60 a 80. Os ganhos das redes maiores ficam dentro da variação entre seeds.
+
+\subsection*{d. Seleção das melhores topologias}
+
+A regra, fixada antes de rodar, ordena as redes pela média menos o desvio da Medida-F de validação, o que pontua desempenho e estabilidade.
+
+\tabela{q3_top4}{As quatro topologias selecionadas.}
+
+\begin{itemize}
+  \item \textbf{80$\times$80:} a melhor pontuação, com Medida-F de 0,9380 e desvio de só 0,0006.
+  \item \textbf{90$\times$90:} a menor perda final de validação entre as selecionadas (0,1853), com desvio de 0,0008.
+  \item \textbf{80$\times$80$\times$80:} a representante com três camadas, com Medida-F de 0,9376, embora com diferença de perda maior (0,0545) e o maior custo do grupo (45,8~ms por época).
+  \item \textbf{60$\times$60$\times$60:} o menor desvio da grade (0,0002), com custo menor que o da rede anterior (36,9~ms).
+\end{itemize}
+
+A rede 40$\times$40$\times$40 tem a maior média (0,9384), mas fica de fora pelo desvio de 0,0028. A ordem das quatro é pouco sensível em termos práticos, dada a proximidade dos valores.
+
+\subsection*{e. Conclusão da etapa}
+
+Nesta base, com LR = 0,01, o número de camadas e de neurônios tem efeito pequeno na generalização. O aumento de capacidade reduz a perda de treino e
+aumenta o custo, e os sinais de overfitting crescem com a profundidade. As quatro redes seguem para a Questão 6, e a 80$\times$80 é a base das Questões 4 e 5.
+
+\FloatBarrier

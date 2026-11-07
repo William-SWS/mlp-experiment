@@ -1,0 +1,24 @@
+\section{Conclusão geral}
+
+A MLP aprendeu o problema com facilidade e chegou a uma Medida-F macro de $0{,}9436 \pm 0{,}0085$ em validação cruzada. Os principais achados de cada etapa foram:
+
+\begin{itemize}
+  \item A inicialização dos pesos afetou pouco o resultado final, e a ReLU foi tão boa quanto a tanh e muito mais rápida que a logistic.
+  \item A taxa de aprendizado e o momento definem a velocidade por meio da taxa efetiva $\eta/(1-m)$. Valores altos trocam velocidade por overfitting rápido e, no extremo, levam ao colapso da rede.
+  \item A topologia teve efeito pequeno. A variação entre as 30 redes é menor que a variação entre partições dos dados.
+  \item Mais dados continuaram reduzindo a perda em toda a faixa testada, com retorno decrescente em Medida-F a partir de cerca de 40\% do treino.
+  \item Dez atributos de forma substituem os 16 originais sem perda mensurável. Colunas de ruído causaram overfitting, e a importância por permutação engana quando os atributos são correlacionados.
+  \item O critério de perda $\le 0{,}001$ só foi atingido por uma rede grande com LR alta, e com forte overfitting. Nesta base, em que as classes se sobrepõem, ele mede a memorização do treino.
+\end{itemize}
+
+A regressão logística ficou a 0,0070 da MLP, e o erro restante se concentra entre Sira e Dermason. Os dados indicam, portanto, que o ganho adicional deve vir mais da informação de entrada do que de redes maiores.
+
+\subsection*{Limitações}
+
+\begin{itemize}
+  \item Três seeds por configuração nas Questões 2, 3 e 5 detectam diferenças grandes, mas não resolvem empates pequenos. Por isso as seleções seguem regras fixadas de antemão, e várias escolhas são equivalentes na prática.
+  \item As topologias têm camadas de mesmo tamanho, e LR e momento foram escolhidos em uma única topologia, sem reavaliação conjunta.
+  \item Na Questão 4, a quantidade de dados varia junto com o número de atualizações dos pesos.
+  \item A seleção final usa o teste, como pede o enunciado, e o k-fold usa a base inteira. Os resultados finais são, assim, levemente otimistas.
+  \item Os tempos valem para uma única máquina e servem apenas para comparações relativas.
+\end{itemize}

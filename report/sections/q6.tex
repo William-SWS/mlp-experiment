@@ -1,0 +1,43 @@
+\section{Questão 6: validação inicial no conjunto de teste}
+
+\subsection*{a. Descrição do experimento}
+
+\textbf{Redes.} As quatro topologias da Questão 3 (80$\times$80, 90$\times$90, 80$\times$80$\times$80 e 60$\times$60$\times$60), com ReLU, softmax, entropia cruzada, SGD com LR = 0,01 e momento = 0,7, usando os 10 atributos de forma da Questão 5. O critério de seleção vem da Questão 3:
+média menos desvio da Medida-F de validação.
+
+\textbf{Ajustes, decididos na validação.} Testou-se $\alpha$ em $\{10^{-4}, 10^{-3}, 10^{-2}\}$ para cada topologia (três seeds), e ficou o valor de menor perda mínima de validação. O limite de épocas passou a ser a época média dessa perda mínima, para interromper o treino antes de o overfitting
+avançar (Tabela~\ref{tab:q6_ajustes}).
+
+\textbf{Avaliação.} Cada rede ajustada foi treinada com cinco seeds no conjunto de treino. O conjunto de teste entra para comparar a generalização, com a perda de entropia cruzada, a acurácia e a Medida-F.
+
+\subsection*{b. Resultados}
+
+\tabela{q6_ajustes}{Ajuste de regularização nos atributos de forma, na validação (três seeds).}
+\tabela{q6_finalistas}{As quatro redes ajustadas, em treino e teste (média de cinco seeds). A coluna dp refere-se à Medida-F de teste.}
+\figura{q6_curvas_perda}{Perda de treino e de teste das quatro redes, a partir da época 20.}{0.75}
+\figura{q6_curvas_acuracia}{Acurácia de treino e de teste das quatro redes, a partir da época 20.}{0.75}
+\tabela{q6_por_classe}{Rede vencedora no teste, por classe (seed de Medida-F mediana).}
+\figura{q6_confusao}{Matriz de confusão da rede vencedora no teste. A cor é a taxa por classe real, e o número é a contagem.}{0.55}
+
+Pela regra de maior média menos desvio, a melhor rede é \textbf{80$\times$80} ($\alpha = 10^{-4}$, 481 épocas), com pontuação de 0,9348. Ela tem Medida-F de teste de 0,9359, com o segundo menor desvio (0,0011).
+
+\subsection*{c. Análise e discussão}
+
+\textbf{As quatro redes são equivalentes na prática.} As Medidas-F de teste ficam entre 0,9345 e 0,9361, uma diferença máxima de 0,0016, menor que o desvio entre seeds de duas delas. A rede 90$\times$90 tem a maior média (0,9361), mas com o dobro do desvio de 80$\times$80. A escolha segue a regra, e os dados não sustentam a afirmação de que uma
+delas é superior. A 80$\times$80 também tem tempo por época menor que o da 90$\times$90 e o da 80$\times$80$\times$80 (Questão 3).
+
+\textbf{Treino e teste.} A rede vencedora tem Medida-F de 0,9540 no treino e 0,9359 no teste, e perda de 0,1542 e 0,2139. Essa diferença existe em todas as redes e se mantém estável ao longo das épocas, sem aumento expressivo da perda de teste. Há um overfitting leve e nenhum sinal de underfitting. O teste também parece mais difícil que a validação para esta divisão específica: a perda
+é de 0,2139 no teste e cerca de 0,187 na validação, e a Questão 7 ajuda a avaliar essa diferença.
+
+\textbf{Ajustes.} A regularização quase não teve efeito: dentro de cada topologia, a perda mínima de validação varia no máximo 0,0006 entre os valores de $\alpha$. Valores maiores de $\alpha$ foram escolhidos em duas redes, mas com diferenças que não têm peso prático. A interrupção do treino importa um pouco mais nas redes de 3 camadas, em que o mínimo surge antes
+(269 e 342 épocas). O maior ajuste foi usar os atributos de forma, que mantêm o desempenho com uma entrada menor.
+
+\textbf{Erros por classe.} Bombay é classificada sem erros, com 78 de 78 exemplos. Sira tem a menor Medida-F (0,8695), e a maior parte dos erros está entre Sira e Dermason: 43 exemplos de Dermason previstos como Sira, e 28 no sentido oposto. A confusão seguinte é de 12 exemplos de Barbunya previstos como Cali. O erro restante se deve, portanto, à sobreposição
+entre variedades parecidas, o que mais capacidade de rede não parece resolver.
+
+\subsection*{d. Conclusão da etapa}
+
+A configuração final é a rede \textbf{80$\times$80} com ReLU, softmax, entropia cruzada, SGD com LR = 0,01, momento = 0,7, $\alpha = 10^{-4}$, 481 épocas e 10 atributos de forma. Ela combina Medida-F de teste entre as mais altas e desvio pequeno, com tempo por época menor que o da 90$\times$90, a rede de maior média. Como as finalistas são muito próximas em uma única divisão dos dados,
+a validação cruzada da próxima etapa é necessária para estimar a generalização sem depender dessa divisão.
+
+\FloatBarrier

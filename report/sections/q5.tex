@@ -1,0 +1,57 @@
+\section{Questão 5: quantidade, qualidade e sensibilidade dos atributos}
+
+\subsection*{a. Descrição do experimento}
+
+A rede é a mesma da Questão 4 (80$\times$80, LR = 0,01, momento = 0,7, ReLU, softmax, entropia cruzada, até 500 épocas), com três seeds por subconjunto.
+
+\textbf{Critérios.} A relevância é medida pela queda da Medida-F de validação ao embaralhar o atributo (média de três redes). A redundância é $|r| > 0{,}95$ no treino: percorrendo os atributos do mais ao menos importante,
+cada um só entra se não for redundante com os já mantidos. O ruído é representado por colunas gaussianas artificiais.
+
+\textbf{Conjuntos testados.}
+\begin{itemize}
+  \item todos os 16 atributos;
+  \item os 12, 8 e 4 mais importantes por permutação;
+  \item 10 atributos não redundantes;
+  \item agrupamento físico: só tamanho (6 atributos) e só forma (10 atributos);
+  \item todos, mais 5 colunas de ruído (21);
+  \item 8 atributos sorteados, um sorteio por seed em cinco seeds;
+  \item remoção de um atributo por vez (16 conjuntos de 15).
+\end{itemize}
+
+A regra de escolha, fixada antes de rodar, é: entre os conjuntos nomeados (sem ruído e sem sorteio), o menor cuja Medida-F de validação fique a até um desvio da melhor. O teste é só reportado.
+
+\subsection*{b. Resultados}
+
+\tabela{q5_subconjuntos}{Resultados por conjunto de atributos. Com 8 atributos sorteados, os conjuntos mudam a cada seed, e por isso o tempo não foi medido.}
+\figura{q5_subconjuntos}{Medida-F de validação por conjunto, com $\pm$ 1 dp.}{0.7}
+\figura{q5_curvas}{Curvas de perda e de acurácia para seis conjuntos, a partir da época 50.}{0.8}
+\tabela{q5_importancia}{Importância por permutação na validação.}
+\figura{q5_importancia}{Queda da Medida-F ao embaralhar cada atributo.}{0.7}
+\tabela{q5_remocao}{Remoção de um atributo por vez, em relação aos 16 atributos (Medida-F de validação de 0,9380).}
+\figura{q5_remocao}{Variação da Medida-F ao remover cada atributo. As barras mostram o dp do conjunto com a remoção.}{0.7}
+
+\subsection*{c. Análise e discussão}
+
+\textbf{Remoção e inclusão.} Reduzir de 16 para 10 atributos não custa nada mensurável, se a escolha for boa: ``Só forma'' tem Medida-F de 0,9384 e ``Sem redundantes'', 0,9365, contra 0,9380 de todos. Cortar mais custa pouco: 0,9318 com 4 atributos,
+mas a convergência fica mais lenta (112 épocas até a perda de 0,20, contra 27). Conjuntos escolhidos sem critério são piores: os 8 sorteados têm média de 0,9223 e desvio de 0,0117, o que mostra que a qualidade pesa mais que a quantidade de atributos.
+
+\textbf{Tamanho e forma.} Os 6 atributos de tamanho sozinhos caem para 0,9197, o pior resultado, e nunca chegam à perda de treino de 0,20. Os de forma igualam o conjunto completo, dentro da variação entre seeds. Isso se explica em parte pela definição dos atributos: \texttt{ShapeFactor1} e
+\texttt{ShapeFactor2} são comprimentos de eixo divididos pela área \cite{koklu2020}, e por isso o conjunto de forma também carrega informação de escala.
+
+\textbf{Atributos redundantes.} Os atributos de tamanho são quase cópias uns dos outros. Removê-los um a um praticamente não altera a Medida-F, e as variações ficam em torno de um desvio.
+
+\textbf{Atributos ruidosos.} As 5 colunas de ruído reduzem a perda de treino (de 0,1539 para 0,1258), mas aumentam a de validação (de 0,1882 para 0,2179) e reduzem a Medida-F de 0,9380 para 0,9325. A rede usa a capacidade extra para memorizar ruído, e a curva de validação
+passa a subir depois de cerca de 150 épocas. Esse é um caso de overfitting provocado apenas pela entrada.
+
+\textbf{Permutação contra remoção.} Os dois métodos discordam, e a discordância é informativa. \texttt{ConvexArea} perde 0,1028 quando embaralhado, mas sua remoção não piora o resultado (variação de +0,0014). O motivo é a correlação: embaralhar um atributo quase igual a \texttt{Area} cria combinações
+que nunca existiram no treino, e a rede erra; removê-lo não muda a informação disponível. Logo, a permutação mede a dependência do modelo treinado, e a remoção mede se a informação é insubstituível. Por esse segundo critério, os atributos mais relevantes são
+\texttt{ShapeFactor4} ($-0{,}0075$), \texttt{Extent} ($-0{,}0037$) e \texttt{Solidity} ($-0{,}0026$). \texttt{ShapeFactor4} é o único que se destaca nos dois métodos. Como cada remoção usa só três seeds, as variações menores que cerca de 0,001 devem ser lidas como empate.
+
+\textbf{Dimensionalidade e tempo.} O tempo por época varia pouco: 32,7~ms com 6 atributos e 36,7~ms com 21, porque os pesos de entrada são uma pequena parte do total nesta rede. A dimensionalidade não afetou a estabilidade dos conjuntos bem escolhidos. A estabilidade dependeu de quais atributos entram.
+
+\subsection*{d. Conclusão da etapa}
+
+O conjunto com melhor equilíbrio é \textbf{``Só forma''} (10 atributos: \texttt{AspectRation}, \texttt{Eccentricity}, \texttt{Extent}, \texttt{Solidity}, \texttt{roundness}, \texttt{Compactness} e os quatro \texttt{ShapeFactor}). Ele teve a maior Medida-F de validação entre os conjuntos nomeados
+e empata com os 16 atributos usando 6 a menos, com tempo por época praticamente igual. O conjunto ``Sem redundantes'' ficou 0,0001 abaixo do corte da regra e é uma alternativa equivalente. O ganho principal é a simplicidade da entrada, já que a economia de tempo é pequena.
+
+\FloatBarrier
