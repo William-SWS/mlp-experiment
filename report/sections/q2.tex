@@ -10,6 +10,11 @@ O treino atualiza os pesos, e a validação apenas acompanha a generalização. 
 entre as combinações sem divergência e com perda final de validação até 5\% acima da melhor, fica a mais rápida até a perda de
 treino de 0,20. A tolerância existe porque diferenças tão pequenas ficam perto da variação entre seeds.
 
+Como nenhuma combinação chega a 0,001 em 500 épocas, a mesma grade foi repetida com limite de 5.000 épocas, parando assim que a perda
+de treino atinge 0,001. Essa segunda rodada mede a velocidade de convergência como o enunciado a define, em épocas até o critério.
+A escolha de LR e momento continua sendo a da grade de 500 épocas: com 5.000 épocas, a perda final de validação passaria a medir
+sobretudo o overfitting acumulado.
+
 \subsection*{b. Resultados}
 
 \tabela{q2_grade}{Grade de LR e momento (média de três seeds, em 500 épocas). ``Atingiu'' e ``Divergiu'' contam execuções.}
@@ -22,10 +27,29 @@ A combinação escolhida foi \textbf{LR = 0,01 e momento = 0,7}: perda de treino
 até a perda de 0,20. As candidatas dentro da tolerância foram LR = 0,001 com momento 0,9 (91 épocas), LR = 0,01 com momento 0,5
 (45 épocas) e a própria escolhida.
 
+\tabela{q2_convergencia}{Grade com limite de 5.000 épocas e parada em perda de treino $\le 0{,}001$ (três seeds). ``Épocas até 0,001''
+é a média entre as seeds que atingiram o critério; as demais colunas são médias das três seeds no fim do treino.}
+\figura{q2_convergencia}{Curvas da grade com limite de 5.000 épocas. Uma curva que termina antes da época 5.000 atingiu o critério de 0,001
+(linha tracejada).}{1}
+
 \subsection*{c. Análise e discussão}
 
-\textbf{Critério de 0,001.} Nenhuma combinação atingiu esse valor em 500 épocas. Por isso, a coluna ``Épocas até 0,001''
-fica vazia, e a velocidade foi comparada pelo limiar de 0,20.
+\textbf{Critério de 0,001.} Em 500 épocas, nenhuma combinação atingiu esse valor, e por isso a velocidade da grade principal foi comparada
+pelo limiar de 0,20. Com limite de 5.000 épocas (Tabela~\ref{tab:q2_convergencia}), o critério passa a ser atingido em três combinações:
+\begin{itemize}
+  \item LR = 0,1 com momento 0,9, nas três seeds, em $2.443 \pm 275$ épocas (de 2.273 a 2.760), a convergência mais rápida;
+  \item LR = 0,1 com momento 0,7, nas três seeds, em $4.136 \pm 730$ épocas (de 3.620 a 4.972);
+  \item LR = 0,5 com momento 0,5, em apenas uma seed, na época 2.861. As outras duas sofrem saltos abruptos da perda a partir das
+    épocas 400 a 600 e terminam com perda de treino de 1,83 e 1,51, ou seja, colapsam.
+\end{itemize}
+Com LR = 0,1 e momento 0,5 a perda fica perto do critério na época 5.000 (de 0,0016 a 0,0036), com LR $\le$ 0,01 fica longe (de 0,020 a 0,166)
+e com LR = 0,5 e momento 0,7 oscila em torno de 0,14.
+Com LR = 0,1, subir o momento de 0,7 para 0,9 reduz em 41\% as épocas até o critério, o que confirma o papel do momento como acelerador.
+
+Atingir o critério tem um custo claro: nas seis execuções com LR = 0,1 que chegaram a 0,001, a acurácia de treino é de praticamente 1,0000,
+enquanto a perda de validação termina entre 1,27 e 1,57. A menor perda de validação dessas mesmas execuções (cerca de 0,19) acontece entre as
+épocas 14 e 111, milhares de épocas antes do critério. A Medida-F de validação, que é de 0,935 com LR = 0,001, cai para 0,918 a 0,920 nas
+combinações com LR = 0,1 que atingem 0,001. Nesta base, em que as classes se sobrepõem, a perda de 0,001 só é alcançada quando a rede memoriza o treino.
 
 \textbf{Taxa de aprendizado muito baixa.} Com LR = 0,001 e momento 0,5, são 447 épocas até a perda de 0,20, e a perda de
 validação ainda está caindo no fim do treino.
@@ -51,5 +75,9 @@ LR = 0,1 com momento 0,9 (0,0265).
 LR = 0,01 com momento = 0,7 teve a menor perda final de validação da grade e, entre as candidatas, a convergência mais rápida,
 sem oscilação visível. Essa combinação fica fixa na Questão 3. Momento e taxa de aprendizado aceleram o treino de forma parecida;
 acima de uma taxa efetiva de aproximadamente 0,1, o ganho de velocidade vem acompanhado de overfitting rápido e, no extremo, de colapso.
+
+Quanto ao critério do enunciado, a convergência mais rápida até a perda de 0,001 é a de LR = 0,1 com momento 0,9 (cerca de 2.400 épocas), seguida
+de LR = 0,1 com momento 0,7 (cerca de 4.100). Essas combinações não foram escolhidas porque, quando atingem o critério, a perda de validação já é
+de sete a oito vezes maior que a mínima.
 
 \FloatBarrier

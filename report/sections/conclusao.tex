@@ -8,7 +8,7 @@ A MLP aprendeu o problema com facilidade e chegou a uma Medida-F macro de $0{,}9
   \item A topologia teve efeito pequeno. A variação entre as 30 redes é menor que a variação entre partições dos dados.
   \item Mais dados continuaram reduzindo a perda em toda a faixa testada, com retorno decrescente em Medida-F a partir de cerca de 40\% do treino.
   \item Dez atributos de forma substituem os 16 originais sem perda mensurável. Colunas de ruído causaram overfitting, e a importância por permutação engana quando os atributos são correlacionados.
-  \item O critério de perda $\le 0{,}001$ só foi atingido por uma rede grande com LR alta, e com forte overfitting. Nesta base, em que as classes se sobrepõem, ele mede a memorização do treino.
+  \item O critério de perda $\le 0{,}001$ só foi atingido com LR = 0,1 ou maior: em cerca de 2.400 épocas na rede 50$\times$50 (momento 0,9) e em menos de 400 na rede 100$\times$100$\times$100 (momento 0,9), sempre com forte overfitting. Nesta base, em que as classes se sobrepõem, ele mede a memorização do treino.
 \end{itemize}
 
 A regressão logística ficou a 0,0070 da MLP, e o erro restante se concentra entre Sira e Dermason. Os dados indicam, portanto, que o ganho adicional deve vir mais da informação de entrada do que de redes maiores.
