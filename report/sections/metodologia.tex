@@ -45,8 +45,9 @@ LR = 0,1. O efeito é moderado porque cada época tem 48 lotes e, com momento 0,
 \subsection{Critérios e métricas}
 
 \begin{itemize}
-  \item \textbf{Parada:} perda de treino $\le 0{,}001$ ou limite de épocas. Como esse valor raramente é atingido, a velocidade
-    também é medida pelas épocas até a perda de treino chegar a 0,20.
+  \item \textbf{Parada:} perda de treino $\le 0{,}001$ ou limite de épocas. Com os limites usados nas etapas (300 a 500 épocas), esse valor
+    não é atingido, e por isso a velocidade também é medida pelas épocas até a perda de treino chegar a 0,20. A Questão 2 repete sua grade
+    com limite de 5.000 épocas para medir as épocas até 0,001, como pede o enunciado.
   \item \textbf{Perda:} entropia cruzada calculada no conjunto inteiro ao fim de cada época, sem o termo L2.
   \item \textbf{Medida-F, precisão e revocação:} médias macro, em que cada classe pesa igual, inclusive a minoritária.
   \item \textbf{Repetições:} três ou cinco seeds por configuração. Os resultados são média e desvio-padrão (dp).
