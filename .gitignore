@@ -20,3 +20,6 @@ report/*.log
 report/*.out
 report/*.run.xml
 report/*.toc
+
+# Pacote de entrega
+entrega_mlp.zip
